@@ -12,7 +12,7 @@ import SwiftUI
 struct FoodDeliveryBundle: WidgetBundle {
     var body: some Widget {
         FoodDelivery()
-        FoodDeliveryControl()
+//        FoodDeliveryControl()
         FoodDeliveryLiveActivity()
     }
 }

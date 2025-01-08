@@ -1776,7 +1776,7 @@ SPEC CHECKSUMS:
   ReactCodegen: daa13d9e48c9bdb1daac4bd694b9dd54e06681df
   ReactCommon: a6b87a7591591f7a52d9c0fec3aa05e0620d5dd3
   SocketRocket: d4aabe649be1e368d1318fdf28a022d714d65748
-  Yoga: c7ea4c36c1d78ebbf45529b6e78283e4e0fe4956
+  Yoga: fcc198acd4a55599b3468cfb6ebc526baff5f06e
 
 PODFILE CHECKSUM: 06a5372cd4f24fc2073b8e133cc026c2410c3092
 

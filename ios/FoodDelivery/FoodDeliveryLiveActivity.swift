@@ -1,4 +1,4 @@
-//
+ //
 //  FoodDeliveryLiveActivity.swift
 //  FoodDelivery
 //
@@ -9,49 +9,43 @@ import ActivityKit
 import WidgetKit
 import SwiftUI
 
-struct FoodDeliveryAttributes: ActivityAttributes {
-    public struct ContentState: Codable, Hashable {
-        // Dynamic stateful properties about your activity go here!
-        var emoji: String
-    }
-
-    // Fixed non-changing properties about your activity go here!
-    var name: String
-}
 
 struct FoodDeliveryLiveActivity: Widget {
     var body: some WidgetConfiguration {
         ActivityConfiguration(for: FoodDeliveryAttributes.self) { context in
-            // Lock screen/banner UI goes here
-            VStack {
-                Text("Hello \(context.state.emoji)")
+            // Lock screen/banner UI
+            ZStack {
+                RoundedRectangle(cornerRadius: 15)
+                    .fill(Color.cyan.opacity(0.3))
+                
+                VStack {
+                    Text("Delivery Status")
+                        .font(.headline)
+                    Text(context.state.leadingTag)
+                        .font(.subheadline)
+                }
+                .padding()
             }
-            .activityBackgroundTint(Color.cyan)
-            .activitySystemActionForegroundColor(Color.black)
-
         } dynamicIsland: { context in
             DynamicIsland {
-                // Expanded UI goes here.  Compose the expanded UI through
-                // various regions, like leading/trailing/center/bottom
+                // Expanded UI
                 DynamicIslandExpandedRegion(.leading) {
-                    Text("Leading")
+                    Text(context.state.leadingTag)
+                        .font(.headline)
                 }
                 DynamicIslandExpandedRegion(.trailing) {
-                    Text("Trailing")
+                    Text("Active")
                 }
                 DynamicIslandExpandedRegion(.bottom) {
-                    Text("Bottom \(context.state.emoji)")
-                    // more content
+                    Text("Delivery in progress")
                 }
             } compactLeading: {
-                Text("L")
+                Text("🚚")
             } compactTrailing: {
-                Text("T \(context.state.emoji)")
+                Text(context.state.leadingTag)
             } minimal: {
-                Text(context.state.emoji)
+                Text("🚚")
             }
-            .widgetURL(URL(string: "http://www.apple.com"))
-            .keylineTint(Color.red)
         }
     }
 }
@@ -64,17 +58,17 @@ extension FoodDeliveryAttributes {
 
 extension FoodDeliveryAttributes.ContentState {
     fileprivate static var smiley: FoodDeliveryAttributes.ContentState {
-        FoodDeliveryAttributes.ContentState(emoji: "😀")
+      FoodDeliveryAttributes.ContentState(leadingTag: "😀")
      }
      
      fileprivate static var starEyes: FoodDeliveryAttributes.ContentState {
-         FoodDeliveryAttributes.ContentState(emoji: "🤩")
+       FoodDeliveryAttributes.ContentState(leadingTag: "🤩")
      }
 }
 
 #Preview("Notification", as: .content, using: FoodDeliveryAttributes.preview) {
    FoodDeliveryLiveActivity()
 } contentStates: {
-    FoodDeliveryAttributes.ContentState.smiley
-    FoodDeliveryAttributes.ContentState.starEyes
+  FoodDeliveryAttributes.ContentState.smiley
+  FoodDeliveryAttributes.ContentState.starEyes
 }
