@@ -1,29 +1,45 @@
-//
-//  SharedAttributes.swift
-//  delivery
-//
-//  Created by Victor Ama on 08/01/2025.
-//
+  //
+  //  SharedAttributes.swift
+  //  delivery
+  //
+  //  Created by Victor Ama on 08/01/2025.
+  //
 
-import Foundation
-import ActivityKit
+  import Foundation
+  import ActivityKit
 
 public struct FoodDeliveryAttributes: ActivityAttributes {
-    public struct ContentState: Codable, Hashable {
-        // Dynamic stateful properties about your activity go here!
-        public var leadingTag: String
-        
-        // Add public initializer
-        public init(leadingTag: String) {
-            self.leadingTag = leadingTag
-        }
-    }
+  public struct ContentState: Codable, Hashable {
+          public var deliveryProgress: Double
+          public var deliveryStatus: String
+          public var remainingTime: TimeInterval
+          public var startedAt: Date
+          
+          public init(
+              deliveryProgress: Double = 0.0,
+              deliveryStatus: String = "Preparing",
+              remainingTime: TimeInterval = 60.0,
+              startedAt: Date = Date()
+          ) {
+              self.deliveryProgress = deliveryProgress
+              self.deliveryStatus = deliveryStatus
+              self.remainingTime = remainingTime
+              self.startedAt = startedAt
+          }
+      }
+      
+      public var orderDetails: String
+      public var totalAmount: String
+      
+  public init(orderDetails: String, totalAmount: String) {
+          self.orderDetails = orderDetails
+          self.totalAmount = totalAmount
+      }
+}
 
-    // Fixed non-changing properties about your activity go here!
-    public var name: String
-    
-    // Add public initializer
-    public init(name: String) {
-        self.name = name
-    }
+
+public func formatTime(_ timeInterval: TimeInterval) -> String {
+    let minutes = Int(timeInterval) / 60
+    let seconds = Int(timeInterval) % 60
+    return String(format: "%d:%02d", minutes, seconds)
 }

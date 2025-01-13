@@ -9,7 +9,13 @@
 
 @interface RCT_EXTERN_MODULE(FoodDelivery, NSObject)
 
++ (bool)requiresMainQueueSetup {
+  return NO;
+}
+
 RCT_EXTERN_METHOD(startActivity)
 RCT_EXTERN_METHOD(endActivity)
-RCT_EXTERN_METHOD(updateActivity: (NSString *) name)
+RCT_EXTERN_METHOD(updateActivity:(NSString *)status
+                  progress:(double)progress
+                  remainingTime:(double)remainingTime)
 @end

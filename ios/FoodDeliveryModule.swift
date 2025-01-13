@@ -8,66 +8,68 @@
 import Foundation
 import ActivityKit
 
-
 @objc(FoodDelivery)
 class FoodDelivery: NSObject {
-  
-  @objc(startActivity)
-  func startActivity() {
-      do {
-          if #available(iOS 16.1, *) {
-              let foodDeliveryAttributes = FoodDeliveryAttributes(name: "Food Delivery")
-              let foodDeliveryContentState = FoodDeliveryAttributes.ContentState(leadingTag: "Leading Name")
-              
-              let activity = try Activity<FoodDeliveryAttributes>.request(
-                  attributes: foodDeliveryAttributes,
-                  content: .init(state: foodDeliveryContentState, staleDate: nil),
-                  pushType: nil
-              )
-              
-              // Add debug prints
-              print("Activity started successfully!")
-              print("Activity ID: \(activity.id)")
-              print("Content State: \(foodDeliveryContentState.leadingTag)")
-              
-          } else {
-              print("Dynamic Island and live activity not supported")
-          }
-      } catch let error {
-          // More detailed error printing
-          print("Failed to start activity: \(error.localizedDescription)")
-          print("Error details: \(error)")
-      }
-  }
-  
-  @objc(updateActivity:)
-  func updateActivity(name: String) {
-      if #available(iOS 16.1, *) {
-          let foodDeliveryContentState = FoodDeliveryAttributes.ContentState(leadingTag: name)
-          
-          Task {
-              for activity in Activity<FoodDeliveryAttributes>.activities {
-                  do {
-                      await activity.update(ActivityContent(state: foodDeliveryContentState, staleDate: nil))
-                  } catch {
-                      print("Error updating activity: \(error)")
-                  }
-              }
-          }
-      } else {
-          print("Live activities not supported")
-      }
-  }
-  @objc(endActivity)
-  func endActivity() {
+    private var deliverySteps = ["Preparing", "On the Way", "At the Address", "Delivered"]
+    private var startTime: Date?
+    
+    @objc(startActivity)
+    func startActivity() {
+        guard ActivityAuthorizationInfo().areActivitiesEnabled else { return }
+        
+        do {
+            if #available(iOS 16.1, *) {
+                startTime = Date()
+                
+                let attributes = FoodDeliveryAttributes(
+                    orderDetails: "Ofada Rice x2",
+                    totalAmount: "N32,000"
+                )
+                
+                let initialState = FoodDeliveryAttributes.ContentState(
+                    deliveryProgress: 0.0,
+                    deliveryStatus: "Preparing",
+                    remainingTime: 60.0,
+                    startedAt: startTime ?? Date()
+                )
+                
+                let _ = try Activity<FoodDeliveryAttributes>.request(
+                    attributes: attributes,
+                    content: .init(state: initialState, staleDate: nil)
+                )
+            }
+        } catch {
+            print("Failed to start activity: \(error)")
+        }
+    }
+    
+  @objc(updateActivity:progress:remainingTime:)
+  func updateActivity(_ status: String, progress: Double, remainingTime: Double) {
+      let elapsedTime = Date().timeIntervalSince(startTime ?? Date())
+      let adjustedRemainingTime = max(60.0 - elapsedTime, 0)
+      
+      let state = FoodDeliveryAttributes.ContentState(
+          deliveryProgress: progress,
+          deliveryStatus: status,
+          remainingTime: adjustedRemainingTime,
+          startedAt: startTime ?? Date()
+      )
+      
       Task {
           for activity in Activity<FoodDeliveryAttributes>.activities {
-              await activity.end(
-                .init(state: activity.content.state, staleDate: nil),
-                  dismissalPolicy: .immediate
-              )
+              await activity.update(ActivityContent(state: state, staleDate: nil))
           }
       }
   }
-  
+    @objc(endActivity)
+    func endActivity() {
+        startTime = nil
+        
+        Task {
+            for activity in Activity<FoodDeliveryAttributes>.activities {
+                await activity.end(.init(state: activity.content.state, staleDate: nil),
+                                 dismissalPolicy: .immediate)
+            }
+        }
+    }
 }
