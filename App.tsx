@@ -6,7 +6,6 @@ const {FoodDelivery} = NativeModules;
 function App() {
   const [remainingTime, setRemainingTime] = useState(60);
   const [deliveryStatus, setDeliveryStatus] = useState('Preparing');
-  const [progress, setProgress] = useState(0);
   const [isActive, setIsActive] = useState(false);
   const startTimeRef = useRef<number>(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -17,6 +16,8 @@ function App() {
     return `${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
   };
 
+
+
   const updateProgress = () => {
     const now = Date.now();
     const elapsedSeconds = Math.floor((now - startTimeRef.current) / 1000);
@@ -24,7 +25,6 @@ function App() {
     const newProgress = Math.min(elapsedSeconds / 60, 1);
 
     setRemainingTime(newRemainingTime);
-    setProgress(newProgress);
 
     let status = 'Preparing';
     if (newProgress >= 0.75) {
@@ -48,12 +48,9 @@ function App() {
     startTimeRef.current = Date.now();
     setIsActive(true);
     setRemainingTime(60);
-    setProgress(0);
     setDeliveryStatus('Preparing');
 
     FoodDelivery.startActivity();
-
-    // Local timer just for UI updates
     timerRef.current = setInterval(updateProgress, 1000);
   };
 
@@ -63,9 +60,8 @@ function App() {
       timerRef.current = null;
     }
     setIsActive(false);
-    setRemainingTime(60); // Reset to initial time
-    setProgress(0);      // Reset progress
-    setDeliveryStatus('Preparing'); // Reset status
+    setRemainingTime(60);
+    setDeliveryStatus('Preparing');
     FoodDelivery.endActivity();
   };
   useEffect(() => {
